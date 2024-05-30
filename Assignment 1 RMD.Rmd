@@ -1,13 +1,121 @@
 ---
-title: "Assignment 1 RMD"
+title: "Assignment 1"
 output: html_document
-date: "2024-05-30"
+date: "2024-05-13"
 ---
-
-```{r setup, include=FALSE}
+```{r,include=FALSE}
 #Loading libraries
 library("dplyr")
 library(tidyverse)
+library(grid)
 library("knitr")
+library("usethis")
+library(ggplot2)
 ```
+## Research question
+
+In this report I aim to investigate how the distribution of types of alcohol consumed over time across different countries has changed. In particular I wish to explore how the trends have overall changed and which countries differ from this trend.
+  
+```{r,echo=FALSE}
+#Load the data
+data_alcohol <- read.csv("data/alcohol-by-type-1890.csv")
+#Remove 'CODE' as this is an extraneous variable
+data_alcohol = subset(data_alcohol, select = -c(2))
+data_alcohol2 = data_alcohol
+#Rename some variables for ease of reading
+names(data_alcohol2) <- c("Country", "Year", "SpiritsPercentage","BeerPercentage","WinePercentage")
+
+```
+
+## Data Introduction
+
+This dataset tracks the proportion of different types of alcohol over time across a range of countries. The data itself is derived from annual databases on wine, compiled by the university of Adelaide.
+
+The variables tracking beer, wine and spirits % represents how much each type of beverage made of total alcohol consumption. The total consumption is based off these 3 drinks so does not include other types such as cider. Year and State variables simply track where and when each observation was made. 
+
+[Data can be found here](https://ourworldindata.org/grapher/alcohol-by-type-1890?tab=table&country=~FRA)
+
+Below is a table displaying the data for just Australia, with the renamed variables in use. A separate table providing the original variable names is also provided to provide clarity.
+```{r,echo=FALSE}
+table_alcohol <- head(data_alcohol2,5)
+knitr::kable(table_alcohol, 
+             caption = "Alcohol consumption by type, Australia",
+             digits = 2)
+
+table_alcohol <- head(data_alcohol,5)
+knitr::kable(table_alcohol, 
+             caption = "Alcohol consumption by type, Australia",
+             digits = 2)
+```
+
+## Data Set Description
+
+```{r,echo=FALSE}
+cat("\nThe number of observations is",nrow(data_alcohol2) , "and the number of variables is", ncol(data_alcohol2))
+
+cat("\nthe number of numerical variables",length(select_if(data_alcohol2,is.numeric)), "and the number of categorical variables is",length(select_if(data_alcohol2,is.character)))
+
+cat("\nCode used to generate this printout is below")
+
+knitr::include_graphics("images/Code.PNG")
+
+#For some reason the length of the output isn't consistent. This is close to 2 rows, if I set the length to 2 we get many more values for the int variables.
+
+cat("\nHere's the first few rows of the data presented such that you can see the type of variable.")
+str(data_alcohol2,vec.len=1)
+```
+
+
+## Data set summary
+
+```{r,echo=FALSE}
+group_by(data_alcohol2)
+
+data_alcohol_grouped = data_alcohol2 %>% group_by(Year) 
+
+data_alcohol_grouped2 = data_alcohol_grouped %>% summarise_at(.vars = vars(BeerPercentage,WinePercentage),
+               .funs = c(mean="mean"))
+
+data_alcohol_grouped = data_alcohol_grouped %>% summarise_at(.vars = vars(BeerPercentage,WinePercentage),
+               .funs = c(var="var"))
+
+data_alcohol_grouped$BeerPercentage_mean=data_alcohol_grouped2$BeerPercentage_mean
+data_alcohol_grouped$WinePercentage_mean=data_alcohol_grouped2$WinePercentage_mean
+
+kable(data_alcohol_grouped, caption = "Mean and variance of beer and wine across all countries over time.")
+```
+
+This data summary suggests that across all countries, the proportion of beer drunk rose over time and peaked in 1964, while wine rose, dipped in 1964, then continued to rise to its current record proportion. Both wine and beer saw a **sharp** decline in variance over time, indicating many countries converging towards a similar proportion of beer and wine drunk.
+
+
+
+
+   
+```{r,echo=FALSE, fig.width=10,fig.height=11}
+
+#Doing the mean for overall is highly uninformative, so we want some method to display multiple countries at once - even if ugly.
+
+data_alcohol_graph <- data_alcohol2 %>% pivot_longer(cols = c(BeerPercentage, WinePercentage,  SpiritsPercentage),
+                           names_to = "Drink_Type")
+
+ggplot(data = data_alcohol_graph, aes(x = factor(Year))) +
+  geom_point(aes(y=value,col=Drink_Type)) + 
+  facet_wrap(~Country) + 
+  labs(caption = "This simple graph allows an easy visualisation of trends over time. One graph is provided for each country. ",color="Type Of Drink\n") +
+  scale_color_manual(labels = c("Beer", "Wine","Spirits"),values = c("blue", "red","black")) +
+  xlab('Year') +
+  ylab("Proportion Drunk")
+```
+
+### Observations
+
+* *Wine saw an increase in many countries, Beer generally rose then dipped then rose again, spirits generally dipped.*
+* *Outlier data is the fall of wine in france and switzerland, the increase of beer in finland, and the increase of spirits in the UK.*
+
+## Conclusions
+
+This provides a cursory overview of the data. The summary and the graph help describe the general trends across many countries. The graph also allows us to identify the listed outliers. These graphs also show the large variance in beer and wine in earlier years that was noted earlier, as well as a similar pattern for spirits. Unfortunately, many countries lack data points for some years, such as Norway and Finland. This makes proper analysis of the trend difficult.
+
+Overall I have identified patterns in the overall trends, with wine increasing, beer rising, falling, then rising again and spirits dipping. I also have identified outlier countries which could form a basis for further analysis.
+
 

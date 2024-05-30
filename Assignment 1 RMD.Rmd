@@ -18,7 +18,7 @@ In this report I aim to investigate how the distribution of types of alcohol con
   
 ```{r,echo=FALSE}
 #Load the data
-data_alcohol <- read.csv("data/alcohol-by-type-1890.csv")
+data_alcohol <- read.csv("Data/alcohol-by-type-1890.csv")
 #Remove 'CODE' as this is an extraneous variable
 data_alcohol = subset(data_alcohol, select = -c(2))
 data_alcohol2 = data_alcohol
@@ -101,7 +101,7 @@ data_alcohol_graph <- data_alcohol2 %>% pivot_longer(cols = c(BeerPercentage, Wi
 ggplot(data = data_alcohol_graph, aes(x = factor(Year))) +
   geom_point(aes(y=value,col=Drink_Type)) + 
   facet_wrap(~Country) + 
-  labs(caption = "This simple graph allows an easy visualisation of trends over time. One graph is provided for each country. ",color="Type Of Drink\n") +
+  labs(caption = "This simple graph allows an easy visualisation of trends over time. One graph is provided for each country. ",color="Type Of Drink\n") +f
   scale_color_manual(labels = c("Beer", "Wine","Spirits"),values = c("blue", "red","black")) +
   xlab('Year') +
   ylab("Proportion Drunk")

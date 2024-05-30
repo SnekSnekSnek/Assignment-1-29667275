@@ -8,9 +8,6 @@ date: "2024-05-30"
 #Loading libraries
 library("dplyr")
 library(tidyverse)
-library(grid)
 library("knitr")
-library("usethis")
-library(ggplot2)
 ```
 

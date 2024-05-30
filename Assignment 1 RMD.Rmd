@@ -1,0 +1,16 @@
+---
+title: "Assignment 1 RMD"
+output: html_document
+date: "2024-05-30"
+---
+
+```{r setup, include=FALSE}
+#Loading libraries
+library("dplyr")
+library(tidyverse)
+library(grid)
+library("knitr")
+library("usethis")
+library(ggplot2)
+```
+

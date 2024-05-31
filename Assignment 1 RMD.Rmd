@@ -132,7 +132,11 @@ data_alcohol_grouped3 = data_alcohol_grouped %>% summarise_at(.vars = vars(BeerP
                .funs = c(mean="mean"))
 
 
-data_alcohol_grouped$BeerPercentage_mean=data_alcohol_grouped3$BeerPercentage_mean
-data_alcohol_grouped$WinePercentage_mean=data_alcohol_grouped3$WinePercentage_mean
+data_alcohol_grouped=left_join(data_alcohol_grouped, data_alcohol_grouped3, by = 'Year')
 
+
+
+data_alcohol_grouped$diffWine <- data_alcohol_grouped$WinePercentage - data_alcohol_grouped$WinePercentage_mean
+data_alcohol_grouped$diffBeer <- data_alcohol_grouped$BeerPercentage - data_alcohol_grouped$WinePercentage_mean
+data_alcohol_grouped$diffSpirits <- data_alcohol_grouped$SpiritsPercentage - data_alcohol_grouped$WinePercentage_mean
 ```

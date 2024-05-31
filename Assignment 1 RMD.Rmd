@@ -61,6 +61,8 @@ knitr::include_graphics("images/Code.PNG")
 
 #For some reason the length of the output isn't consistent. This is close to 2 rows, if I set the length to 2 we get many more values for the int variables.
 
+#USE UNGROUP() TO FIX THE ISSUE, THEN REDO SCREENSHOT
+
 cat("\nHere's the first few rows of the data presented such that you can see the type of variable.")
 str(data_alcohol2,vec.len=1)
 ```
@@ -139,4 +141,25 @@ data_alcohol_grouped=left_join(data_alcohol_grouped, data_alcohol_grouped3, by =
 data_alcohol_grouped$diffWine <- data_alcohol_grouped$WinePercentage - data_alcohol_grouped$WinePercentage_mean
 data_alcohol_grouped$diffBeer <- data_alcohol_grouped$BeerPercentage - data_alcohol_grouped$WinePercentage_mean
 data_alcohol_grouped$diffSpirits <- data_alcohol_grouped$SpiritsPercentage - data_alcohol_grouped$WinePercentage_mean
+
+#Now we want to decipher where the divergences from the mean are largest.
+
+arrange(data_alcohol_grouped, by_group = diffWine)
+#This seems to work but we need to ungroup the dataframe
+#strat seems to be make a separate vector/df that's hopefully not grouped
+
+
+ungroup_df = ungroup(ungroup_df)
+
+#Make ddataframes out of these top 5
+Wine_Deviants <- top_n(ungroup_df,5,diffWine)
+Beer_Deviants <- top_n(ungroup_df,5,diffBeer)
+Spirits_Deviants <- top_n(ungroup_df,5,diffSpirits)
+
+#Remove extraneous columns
+Wine_Deviants <- Wine_Deviants[ -c(3:8,10,11) ]
+Beer_Deviants <- Beer_Deviants[ -c(3:9,11) ]
+Spirits_Deviants <- Spirits_Deviants[ -c(3:10) ]
+
+#Make names more comprehensible for final analsysis
 ```

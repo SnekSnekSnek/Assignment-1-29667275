@@ -101,7 +101,7 @@ data_alcohol_graph <- data_alcohol2 %>% pivot_longer(cols = c(BeerPercentage, Wi
 ggplot(data = data_alcohol_graph, aes(x = factor(Year))) +
   geom_point(aes(y=value,col=Drink_Type)) + 
   facet_wrap(~Country) + 
-  labs(caption = "This simple graph allows an easy visualisation of trends over time. One graph is provided for each country. ",color="Type Of Drink\n") +f
+  labs(caption = "This simple graph allows an easy visualisation of trends over time. One graph is provided for each country. ",color="Type Of Drink\n") +
   scale_color_manual(labels = c("Beer", "Wine","Spirits"),values = c("blue", "red","black")) +
   xlab('Year') +
   ylab("Proportion Drunk")
@@ -119,3 +119,20 @@ This provides a cursory overview of the data. The summary and the graph help des
 Overall I have identified patterns in the overall trends, with wine increasing, beer rising, falling, then rising again and spirits dipping. I also have identified outlier countries which could form a basis for further analysis.
 
 
+## Expansion
+
+We can focus on the outliers. Step 1 can be to make a table showing the means of each drink in each year, and then the difference of each country next to it.
+
+```{r,echo=FALSE}
+group_by(data_alcohol2)
+
+data_alcohol_grouped = data_alcohol2 %>% group_by(Year) 
+
+data_alcohol_grouped3 = data_alcohol_grouped %>% summarise_at(.vars = vars(BeerPercentage,WinePercentage,SpiritsPercentage),
+               .funs = c(mean="mean"))
+
+
+data_alcohol_grouped$BeerPercentage_mean=data_alcohol_grouped3$BeerPercentage_mean
+data_alcohol_grouped$WinePercentage_mean=data_alcohol_grouped3$WinePercentage_mean
+
+```

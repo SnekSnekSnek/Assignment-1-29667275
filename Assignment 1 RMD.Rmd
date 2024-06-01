@@ -226,7 +226,7 @@ FinalDataframe3Graphing <- FinalDataframe2 %>% pivot_longer(cols = c(diffWine, d
 
 FinalDataframe3Graphing <- na.omit(FinalDataframe3Graphing)
 
-ggplot(data = FinalDataframe, aes(x = factor(Year))) +
+ggplot(data = FinalDataframe3Graphing, aes(x = factor(Year))) +
   geom_point(aes(y=value,col=Drink_Type)) + 
   facet_wrap(~Country) + 
   labs(caption = "This simple graph allows an easy visualisation of trends over time. One graph is provided for each country. ",color="Type Of Drink\n") +

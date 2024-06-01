@@ -125,7 +125,7 @@ Overall I have identified patterns in the overall trends, with wine increasing, 
 
 We can focus on the outliers. Step 1 can be to make a table showing the means of each drink in each year, and then the difference of each country next to it.
 
-```{r,echo=FALSE}
+```{r,include = FALSE}
 group_by(data_alcohol2)
 
 data_alcohol_grouped = data_alcohol2 %>% group_by(Year) 
@@ -153,7 +153,9 @@ ungroup_df = ungroup(ungroup_df)
 
 #Make ddataframes out of these top 5
 Wine_Deviants <- top_n(ungroup_df,5,diffWine)
+arrange(data_alcohol_grouped, by_group = diffBeer)
 Beer_Deviants <- top_n(ungroup_df,5,diffBeer)
+arrange(data_alcohol_grouped, by_group = diffSpirits)
 Spirits_Deviants <- top_n(ungroup_df,5,diffSpirits)
 
 #Remove extraneous columns
@@ -161,5 +163,53 @@ Wine_Deviants <- Wine_Deviants[ -c(3:8,10,11) ]
 Beer_Deviants <- Beer_Deviants[ -c(3:9,11) ]
 Spirits_Deviants <- Spirits_Deviants[ -c(3:10) ]
 
-#Make names more comprehensible for final analsysis
+#Make country vector names more comprehensible for final analsysis
+names(Wine_Deviants) <- c("CountryWine", "Year", "DiffWine")
+names(Beer_Deviants) <- c("CountryBeer", "Year", "DiffBeer")
+names(Spirits_Deviants) <- c("CountrySpirits", "Year", "DiffSpirits")
+
+
+#Select the rows from our initial data table that we found had the highest variance
+#This solution is a bit poor as it only works with my knowledge of what the values for the highest variance entries already are. A more wise approach would automate this by pulling the values from the 'Spirits/Wine/Beer_Deviants" tables directly. This still works fine for my purposes however.
+
+WineDiff1 <- data_alcohol_grouped[data_alcohol_grouped$Country == 'France' & data_alcohol_grouped$Year == 1964, ]
+WineDiff2 <- data_alcohol_grouped[data_alcohol_grouped$Country == 'Italy' & data_alcohol_grouped$Year == 1890, ]
+WineDiff3 <- data_alcohol_grouped[data_alcohol_grouped$Country == 'Italy' & data_alcohol_grouped$Year == 1929, ]
+WineDiff4 <- data_alcohol_grouped[data_alcohol_grouped$Country == 'Italy' & data_alcohol_grouped$Year == 1964, ]
+WineDiff5 <- data_alcohol_grouped[data_alcohol_grouped$Country == 'Italy' & data_alcohol_grouped$Year == 1984, ]
+
+#We remove extraneous values. For example we eventually want a list of the 5 entries with the higest deviation from the mean in wine consumption, so we remove values relating to beer and spirits for clarity.
+
+WineDiff1[c(3,4,6,8,10,11)] = NA
+WineDiff2[c(3,4,6,8,10,11)] = NA
+WineDiff3[c(3,4,6,8,10,11)] = NA
+WineDiff4[c(3,4,6,8,10,11)] = NA
+WineDiff5[c(3,4,6,8,10,11)] = NA
+
+BeerDiff1 <- data_alcohol_grouped[data_alcohol_grouped$Country == 'Australia' & data_alcohol_grouped$Year == 1964, ]
+BeerDiff2 <- data_alcohol_grouped[data_alcohol_grouped$Country == 'Belgium' & data_alcohol_grouped$Year == 1964, ]
+BeerDiff3 <- data_alcohol_grouped[data_alcohol_grouped$Country == 'Denmark' & data_alcohol_grouped$Year == 1964, ]
+BeerDiff4 <- data_alcohol_grouped[data_alcohol_grouped$Country == 'Denmark' & data_alcohol_grouped$Year == 1964, ]
+BeerDiff5 <- data_alcohol_grouped[data_alcohol_grouped$Country == 'United Kingdom' & data_alcohol_grouped$Year == 1964, ]
+
+BeerDiff1[c(3,5,7,8,9,11)] = NA
+BeerDiff2[c(3,5,7,8,9,11)] = NA
+BeerDiff3[c(3,5,7,8,9,11)] = NA
+BeerDiff4[c(3,5,7,8,9,11)] = NA
+BeerDiff5[c(3,5,7,8,9,11)] = NA
+
+SpiritsDiff1 <- data_alcohol_grouped[data_alcohol_grouped$Country == 'Finland' & data_alcohol_grouped$Year == 1964, ]
+SpiritsDiff2 <- data_alcohol_grouped[data_alcohol_grouped$Country == 'Japan' & data_alcohol_grouped$Year == 1964, ]
+SpiritsDiff3 <- data_alcohol_grouped[data_alcohol_grouped$Country == 'Japan' & data_alcohol_grouped$Year == 1984, ]
+SpiritsDiff4 <- data_alcohol_grouped[data_alcohol_grouped$Country == 'Netherlands' & data_alcohol_grouped$Year == 1890, ]
+SpiritsDiff5 <- data_alcohol_grouped[data_alcohol_grouped$Country == 'Norway' & data_alcohol_grouped$Year == 1964, ]
+
+SpiritsDiff1[c(4:7,9,10)] = NA
+SpiritsDiff2[c(4:7,9,10)] = NA
+SpiritsDiff3[c(4:7,9,10)] = NA
+SpiritsDiff4[c(4:7,9,10)] = NA
+SpiritsDiff5[c(4:7,9,10)] = NA
+
+FinalDataframe <- bind_rows(WineDiff1,WineDiff2,WineDiff3,WineDiff4,WineDiff5,BeerDiff1,BeerDiff2,BeerDiff3,BeerDiff4,BeerDiff5,SpiritsDiff1,SpiritsDiff2,SpiritsDiff3,SpiritsDiff4,SpiritsDiff5)
 ```
+

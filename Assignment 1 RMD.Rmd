@@ -125,6 +125,8 @@ Overall I have identified patterns in the overall trends, with wine increasing, 
 
 We can focus on the outliers. Step 1 can be to make a table showing the means of each drink in each year, and then the difference of each country next to it.
 
+This will be a table of the highest positive differences, where countries drink more of a particular type than the global mean. The differences are generally stronger in this direction in this dataset and so are most interesting. A near identical procedure can create a similar analysis of the differences in the other direction.
+
 ```{r,include = FALSE}
 group_by(data_alcohol2)
 
@@ -222,15 +224,16 @@ words
 FinalDataframe2 = subset(FinalDataframe, select = -c(3:8))
 #Rework this line to factor down for the thing
 FinalDataframe3Graphing <- FinalDataframe2 %>% pivot_longer(cols = c(diffWine, diffBeer,  diffSpirits),
-                           names_to = "Drink_Type")
+                           names_to = "Difference_Type")
 
 FinalDataframe3Graphing <- na.omit(FinalDataframe3Graphing)
 
 ggplot(data = FinalDataframe3Graphing, aes(x = factor(Year))) +
-  geom_point(aes(y=value,col=Drink_Type)) + 
-  facet_wrap(~Country) + 
+  geom_point(aes(y=value,col=Country)) + 
   labs(caption = "This simple graph allows an easy visualisation of trends over time. One graph is provided for each country. ",color="Type Of Drink\n") +
-  scale_color_manual(labels = c("Beer", "Wine","Spirits"),values = c("blue", "red","black")) +
+  scale_color_manual(labels = c("France", "Italy","Australia","Belgium","Denmark","United Kingdom","Finland","Japan","Netherlands","Norway"),values = c("blue", "red","black","green","orange","powderblue","brown","pink","maroon","purple")) +
+  facet_wrap(~Difference_Type) +
   xlab('Year') +
-  ylab("Proportion Drunk")
+  ylab("Deviation from global mean") +
+  ylim(0, 70)
 ```

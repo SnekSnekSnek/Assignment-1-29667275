@@ -220,8 +220,8 @@ words words
 FinalDataframe
 ```
 words
-```{r}
-FinalDataframe2 = subset(FinalDataframe, select = -c(3:8))
+```{r,fig.width=10,fig.height=11}
+FinalDataframe2 = subset(data_alcohol_grouped, select = -c(3:8))
 #Rework this line to factor down for the thing
 FinalDataframe3Graphing <- FinalDataframe2 %>% pivot_longer(cols = c(diffWine, diffBeer,  diffSpirits),
                            names_to = "Difference_Type")
@@ -229,11 +229,11 @@ FinalDataframe3Graphing <- FinalDataframe2 %>% pivot_longer(cols = c(diffWine, d
 FinalDataframe3Graphing <- na.omit(FinalDataframe3Graphing)
 
 ggplot(data = FinalDataframe3Graphing, aes(x = factor(Year))) +
-  geom_point(aes(y=value,col=Country)) + 
+  geom_point(aes(y=value,col=Difference_Type)) + 
   labs(caption = "This simple graph allows an easy visualisation of trends over time. One graph is provided for each country. ",color="Type Of Drink\n") +
-  scale_color_manual(labels = c("France", "Italy","Australia","Belgium","Denmark","United Kingdom","Finland","Japan","Netherlands","Norway"),values = c("blue", "red","black","green","orange","powderblue","brown","pink","maroon","purple")) +
-  facet_wrap(~Difference_Type) +
+  facet_wrap(~Country) +
   xlab('Year') +
   ylab("Deviation from global mean") +
-  ylim(0, 70)
+  ylim(-35, 70) +
+  geom_hline(yintercept=0) 
 ```

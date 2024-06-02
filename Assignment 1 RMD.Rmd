@@ -123,9 +123,9 @@ Overall I have identified patterns in the overall trends, with wine increasing, 
 
 ## Expansion
 
-We can focus on the outliers. Step 1 can be to make a table showing the means of each drink in each year, and then the difference of each country next to it.
+As noted earlier, there were some outlier values, and indication these values were more common in the past. Next I elaborate by investigating these differences.
 
-This will be a table of the highest positive differences, where countries drink more of a particular type than the global mean. The differences are generally stronger in this direction in this dataset and so are most interesting. A near identical procedure can create a similar analysis of the differences in the other direction.
+Below is a table of the highest positive differences, where countries drink more of a particular type than the global mean. The differences are generally stronger in this direction in this dataset and so are most interesting. A near identical procedure can create a similar analysis of the differences in the other direction.
 
 ```{r,include = FALSE}
 group_by(data_alcohol2)
@@ -214,12 +214,12 @@ SpiritsDiff5[c(4:7,9,10)] = NA
 
 FinalDataframe <- bind_rows(WineDiff1,WineDiff2,WineDiff3,WineDiff4,WineDiff5,BeerDiff1,BeerDiff2,BeerDiff3,BeerDiff4,BeerDiff5,SpiritsDiff1,SpiritsDiff2,SpiritsDiff3,SpiritsDiff4,SpiritsDiff5)
 ```
-words words
+This table displays the entries with greatest deviance from the global mean per year. Each entry only corresponds to one type of drink, so columns for the other types of drinks are left blank for each entry.
 ```{r}
 #Display the new table
 FinalDataframe
 ```
-words
+This graph provides a more thorough overview of the situation than the aforementioned table. All entries are included, the graph is faceted according to country and color coded according to drink type. Additionally, a bar line is provided in the graph, this line indicates where the deviation from the mean is zero. It allows an easy way to see how the amount of variance changes over time.
 ```{r,fig.width=10,fig.height=11}
 FinalDataframe2 = subset(data_alcohol_grouped, select = -c(3:8))
 #Rework this line to factor down for the thing
@@ -230,10 +230,17 @@ FinalDataframe3Graphing <- na.omit(FinalDataframe3Graphing)
 
 ggplot(data = FinalDataframe3Graphing, aes(x = factor(Year))) +
   geom_point(aes(y=value,col=Difference_Type)) + 
-  labs(caption = "This simple graph allows an easy visualisation of trends over time. One graph is provided for each country. ",color="Type Of Drink\n") +
+  labs(color="Type Of Drink\n") +
   facet_wrap(~Country) +
   xlab('Year') +
   ylab("Deviation from global mean") +
+  scale_color_manual(labels = c("Beer", "Spirits","Wine"),values = c("blue", "red","black")) +
   ylim(-35, 70) +
   geom_hline(yintercept=0) 
 ```
+
+### Conclusions 
+
+This further analysis serves to provide detail to existing conclusions. We can see Italy consistently drunk more wine than other countries. Denmark and Japan seemed to be the greatest excess consumers of beer and spirits, respectively. Additionally, all 15 entries tabulated occurred before 2014, and most entries appear in the year of 1964. This seems to confirm the findings of the graph.
+
+The chart shows a consistent trend towards the global mean for all countries over time. For each country, the drink with the largest difference from global mean is either beer or spirits, with only 3 out of 16 countries drinking more wine than others. Spirits and beer have similar numbers, though beer leads slightly more often. The 3 top wine consumers are geographically close, which provides weak support for the hypothesis that globalisation is the cause of a general move towards all countries having more similar drink distribution.

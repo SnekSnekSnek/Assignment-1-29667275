@@ -61,12 +61,10 @@ cat("\nCode used to generate this printout is below")
 
 knitr::include_graphics("images/Code.PNG")
 
-#For some reason the length of the output isn't consistent. This is close to 2 rows, if I set the length to 2 we get many more values for the int variables.
-
-#USE UNGROUP() TO FIX THE ISSUE, THEN REDO SCREENSHOT
+#Merge conflict
 
 cat("\nHere's the first few rows of the data presented such that you can see the type of variable.")
-str(data_alcohol2,vec.len=1)
+str(data_alcohol2,vec.len=2)
 ```
 
 

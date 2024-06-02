@@ -66,7 +66,7 @@ knitr::include_graphics("images/Code.PNG")
 ungroup(data_alcohol2)
 
 cat("\nHere's the first few rows of the data presented such that you can see the type of variable.")
-str(data_alcohol2,vec.len=1)
+str(data_alcohol2,vec.len=3)
 ```
 
 

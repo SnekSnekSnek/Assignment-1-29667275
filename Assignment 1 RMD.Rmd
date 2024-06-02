@@ -16,7 +16,7 @@ library(ggplot2)
 
 In this report I aim to investigate how the distribution of types of alcohol consumed over time across different countries has changed. In particular I wish to explore how the trends have overall changed and which countries differ from this trend.
   
-```{r,echo=FALSE}
+```{r}
 #Load the data
 data_alcohol <- read.csv("Data/alcohol-by-type-1890.csv")
 #Remove 'CODE' as this is an extraneous variable
@@ -36,12 +36,14 @@ The variables tracking beer, wine and spirits % represents how much each type of
 [Data can be found here](https://ourworldindata.org/grapher/alcohol-by-type-1890?tab=table&country=~FRA)
 
 Below is a table displaying the data for just Australia, with the renamed variables in use. A separate table providing the original variable names is also provided to provide clarity.
-```{r,echo=FALSE}
+```{r}
+#Make a table of the first 5 entries only
 table_alcohol <- head(data_alcohol2,5)
+#Display table
 knitr::kable(table_alcohol, 
              caption = "Alcohol consumption by type, Australia",
              digits = 2)
-
+#Repeat but for dataframe with old variables
 table_alcohol <- head(data_alcohol,5)
 knitr::kable(table_alcohol, 
              caption = "Alcohol consumption by type, Australia",
@@ -50,7 +52,7 @@ knitr::kable(table_alcohol,
 
 ## Data Set Description
 
-```{r,echo=FALSE}
+```{r}
 cat("\nThe number of observations is",nrow(data_alcohol2) , "and the number of variables is", ncol(data_alcohol2))
 
 cat("\nthe number of numerical variables",length(select_if(data_alcohol2,is.numeric)), "and the number of categorical variables is",length(select_if(data_alcohol2,is.character)))
@@ -70,36 +72,34 @@ str(data_alcohol2,vec.len=1)
 
 ## Data set summary
 
-```{r,echo=FALSE}
+```{r}
 group_by(data_alcohol2)
 
+#Group data frame by year
 data_alcohol_grouped = data_alcohol2 %>% group_by(Year) 
 
+#Summarise Beer and Wine by their means across each year. This creates a 'mean of beer drunk per year'.
 data_alcohol_grouped2 = data_alcohol_grouped %>% summarise_at(.vars = vars(BeerPercentage,WinePercentage),
                .funs = c(mean="mean"))
-
+#Same process but for variance.
 data_alcohol_grouped = data_alcohol_grouped %>% summarise_at(.vars = vars(BeerPercentage,WinePercentage),
                .funs = c(var="var"))
-
+#Save results from above as vectors in dataframe
 data_alcohol_grouped$BeerPercentage_mean=data_alcohol_grouped2$BeerPercentage_mean
 data_alcohol_grouped$WinePercentage_mean=data_alcohol_grouped2$WinePercentage_mean
-
+#Display data
 kable(data_alcohol_grouped, caption = "Mean and variance of beer and wine across all countries over time.")
 ```
 
 This data summary suggests that across all countries, the proportion of beer drunk rose over time and peaked in 1964, while wine rose, dipped in 1964, then continued to rise to its current record proportion. Both wine and beer saw a **sharp** decline in variance over time, indicating many countries converging towards a similar proportion of beer and wine drunk.
-
-
-
-
    
-```{r,echo=FALSE, fig.width=10,fig.height=11}
+```{r, fig.width=10,fig.height=11}
 
-#Doing the mean for overall is highly uninformative, so we want some method to display multiple countries at once - even if ugly.
-
+#Convert data to long format so it's more easily graphed
 data_alcohol_graph <- data_alcohol2 %>% pivot_longer(cols = c(BeerPercentage, WinePercentage,  SpiritsPercentage),
                            names_to = "Drink_Type")
 
+#Generate GGplot. Very straightforward plot, the y-axis is the value of Beer/Wine/Spirits percentage which we summarised into one column when we made data long above. Colour by drink type, facet by country then label the information.
 ggplot(data = data_alcohol_graph, aes(x = factor(Year))) +
   geom_point(aes(y=value,col=Drink_Type)) + 
   facet_wrap(~Country) + 
@@ -127,33 +127,29 @@ As noted earlier, there were some outlier values, and indication these values we
 
 Below is a table of the highest positive differences, where countries drink more of a particular type than the global mean. The differences are generally stronger in this direction in this dataset and so are most interesting. A near identical procedure can create a similar analysis of the differences in the other direction.
 
-```{r,include = FALSE}
+```{r}
 group_by(data_alcohol2)
-
+#Same as the earlier iteration, group by year.
 data_alcohol_grouped = data_alcohol2 %>% group_by(Year) 
-
+#Summarise mean by each year.
 data_alcohol_grouped3 = data_alcohol_grouped %>% summarise_at(.vars = vars(BeerPercentage,WinePercentage,SpiritsPercentage),
                .funs = c(mean="mean"))
 
-
+#Join the two dataframes by year. One dataframe contains the original data which includes how much of each type of drink is consumed by each country each year, and the other contains the 'global mean' for each variable per year. Creates a version of the original table where the global mean per year can be compared to the entries with a matching year easily.
 data_alcohol_grouped=left_join(data_alcohol_grouped, data_alcohol_grouped3, by = 'Year')
 
-
-
+#Create a difference between an entry's beer/wine/spirits drunk and the global mean, done by year. Save the difference into each entry/row.
 data_alcohol_grouped$diffWine <- data_alcohol_grouped$WinePercentage - data_alcohol_grouped$WinePercentage_mean
 data_alcohol_grouped$diffBeer <- data_alcohol_grouped$BeerPercentage - data_alcohol_grouped$WinePercentage_mean
 data_alcohol_grouped$diffSpirits <- data_alcohol_grouped$SpiritsPercentage - data_alcohol_grouped$WinePercentage_mean
 
 #Now we want to decipher where the divergences from the mean are largest.
-
+#Arrange so biggest differences at the top.
 arrange(data_alcohol_grouped, by_group = diffWine)
-#This seems to work but we need to ungroup the dataframe
-#strat seems to be make a separate vector/df that's hopefully not grouped
-
-
-ungroup_df = ungroup(ungroup_df)
-
-#Make ddataframes out of these top 5
+#Data needs to be ungrouped, seems to be grouped by country so top 5 selects top 5 countries rather than top 5 entries.
+ungroup_df = ungroup(data_alcohol_grouped)
+#Then pick out top 5 entries of the diffWine vector after it was sorted top to bottom.
+#Repeat for beer and spirits.
 Wine_Deviants <- top_n(ungroup_df,5,diffWine)
 arrange(data_alcohol_grouped, by_group = diffBeer)
 Beer_Deviants <- top_n(ungroup_df,5,diffBeer)
@@ -212,22 +208,25 @@ SpiritsDiff3[c(4:7,9,10)] = NA
 SpiritsDiff4[c(4:7,9,10)] = NA
 SpiritsDiff5[c(4:7,9,10)] = NA
 
+#Bind final dataframe together, each entry I just constructed becomes a separate row, each row contains the original dataframes entry, with the drink difference variable attached, and the variables relating to other drinks removed.
+
 FinalDataframe <- bind_rows(WineDiff1,WineDiff2,WineDiff3,WineDiff4,WineDiff5,BeerDiff1,BeerDiff2,BeerDiff3,BeerDiff4,BeerDiff5,SpiritsDiff1,SpiritsDiff2,SpiritsDiff3,SpiritsDiff4,SpiritsDiff5)
 ```
 This table displays the entries with greatest deviance from the global mean per year. Each entry only corresponds to one type of drink, so columns for the other types of drinks are left blank for each entry.
 ```{r}
 #Display the new table
-FinalDataframe
+kable(FinalDataframe)
 ```
 This graph provides a more thorough overview of the situation than the aforementioned table. All entries are included, the graph is faceted according to country and color coded according to drink type. Additionally, a bar line is provided in the graph, this line indicates where the deviation from the mean is zero. It allows an easy way to see how the amount of variance changes over time.
-```{r,fig.width=10,fig.height=11}
+```{r,fig.width=10,fig.height=11,}
 FinalDataframe2 = subset(data_alcohol_grouped, select = -c(3:8))
-#Rework this line to factor down for the thing
+#Same as last graph actually, convert data to long for easy access.
 FinalDataframe3Graphing <- FinalDataframe2 %>% pivot_longer(cols = c(diffWine, diffBeer,  diffSpirits),
                            names_to = "Difference_Type")
-
+#Don't plot NA values
 FinalDataframe3Graphing <- na.omit(FinalDataframe3Graphing)
 
+#Graph is same as before now.
 ggplot(data = FinalDataframe3Graphing, aes(x = factor(Year))) +
   geom_point(aes(y=value,col=Difference_Type)) + 
   labs(color="Type Of Drink\n") +
